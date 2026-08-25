@@ -2,15 +2,15 @@
 
 Documento di design: sintetizza le scelte metodologiche per ogni fase della pipeline, con la
 motivazione alle spalle di ciascuna e le note di riferimento a supporto. Non è codice — è la
-guida seguita per scrivere il notebook (un notebook unico, fase per fase, codice e spiegazione,
-grafici dove aiutano l'interpretazione).
+guida seguita per scrivere il notebook narrativo e la sua versione compatta per Kaggle.
 
 ## Promemoria dataset
-230.400 righe, 19 colonne, 16 `asset_id`, 2025-02-01→2025-02-10 (10 giorni), frequenza
-al minuto. Missing ~0,38% sulle colonne sensoriali (misurato direttamente sul file).
-`anomaly_label`
-disponibile su ~2,37% dei campioni (parziale, mai usata per il training).
-`fault_code_true` diverso da 0 su ~4,00%. Colonne: `timestamp, asset_id, regime,
+Il generatore pubblico deterministico produce 230.400 righe, 19 colonne, 16 `asset_id`,
+2025-02-01→2025-02-10 (10 giorni), frequenza al minuto e ~0,38% di missing sulle colonne
+sensoriali. `anomaly_label` è disponibile sul 2,244% dei campioni (parziale, mai usata per il
+training); `fault_code_true` è diverso da 0 sul 3,75%. Il notebook storico usa lo stesso schema,
+ma i suoi risultati numerici documentano un precedente CSV locale non distribuito. Colonne:
+`timestamp, asset_id, regime,
 ambient_temp_c, humidity_pct, load_pct, rpm, current_a, pressure_bar, flow_lpm,
 temp_c, vib_rms, vib_crest, vib_kurtosis, fault_code_true, fault_type_true,
 anomaly_label, site_id, line_id`.

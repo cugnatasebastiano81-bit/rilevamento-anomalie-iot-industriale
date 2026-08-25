@@ -11,9 +11,10 @@ Design completo della pipeline, fase per fase, con le motivazioni dietro ogni sc
 
 ## Dataset
 
-Dati sintetici, **non inclusi in questo repository** (esclusi da git, vedi `.gitignore`): 230.400
-righe, 19 colonne, 16 `asset_id`, copertura temporale 2025-02-01 → 2025-02-10 (10 giorni),
-frequenza al minuto, ~0,38% di missing sulle colonne sensoriali.
+Il repository include un generatore originale e deterministico (`src/synthetic_data.py`) che crea
+in memoria 230.400 righe, 19 colonne e 16 `asset_id`: 10 giorni dal 2025-02-01 al 2025-02-10,
+frequenza al minuto e circa 0,38% di missing sulle colonne sensoriali. Il generatore non legge,
+campiona o trasforma dataset esterni.
 
 Colonne attese in `data/raw/iot_synth_anomaly_clustering.csv`:
 
@@ -27,13 +28,19 @@ Colonne attese in `data/raw/iot_synth_anomaly_clustering.csv`:
 | `fault_code_true`, `fault_type_true` | riferimento sintetico ai guasti — **mai usato per il training**, solo per validazione a posteriori |
 | `anomaly_label` | annotazione positiva parziale — **mai usata per il training** e non trattata come ground truth completa |
 
-Per eseguire la pipeline su dati propri con lo stesso schema, posizionare il CSV in
-`data/raw/iot_synth_anomaly_clustering.csv`.
+Per generare una copia locale riproducibile, esclusa da Git:
 
-Il dataset sintetico usato per produrre i risultati documentati non è distribuito con questo progetto.
-La sua provenienza e la licenza di redistribuzione non sono state verificate, quindi il file non deve
-essere redistribuito sulla base di questo repository. Per riprodurre l'analisi è necessario fornire
-localmente un CSV compatibile con lo schema descritto sopra.
+```bash
+python scripts/generate_synthetic_iot_data.py --output data/raw/iot_synth_kaggle_generated.csv
+```
+
+Con seed predefinito `20260825`, il CSV ha SHA-256
+`4e38b81b29b3a4458bc95f91d664b7f5e6dd5d1af96a5dc82d77650aee674345`.
+
+Il notebook narrativo storico è stato realizzato su un precedente CSV locale, non redistribuito e
+non necessario per la dimostrazione Kaggle. I suoi risultati restano documentazione dello studio
+originario. Il nuovo notebook `kaggle/rilevamento_anomalie_iot_kaggle.ipynb` è invece completamente
+riproducibile: genera i dati in memoria e riusa la stessa pipeline testata in `src/`.
 
 ## Stato del progetto
 
@@ -49,7 +56,25 @@ localmente un CSV compatibile con lo schema descritto sopra.
 Notebook narrativo (spiegazione, codice, grafici, risultati per fase):
 `notebooks/Rilevamento di anomalie in dati IoT con clustering-Sebastiano_Cugnata.ipynb`.
 
-### Risultati chiave (Fasi 1–6)
+Notebook Kaggle riproducibile:
+`kaggle/rilevamento_anomalie_iot_kaggle.ipynb`.
+
+### Risultati chiave della dimostrazione Kaggle riproducibile
+
+- Split temporale: 160.678 righe di train e 68.702 righe di test dopo interpolazione separata e
+  costruzione delle feature mobili.
+- 30 feature, standardizzate con parametri appresi solo sul train; PCA a 10 componenti con 90,98%
+  di varianza spiegata.
+- K-Means con K=3: cluster bilanciati sul train (33,41% / 33,38% / 33,21%) e sul test
+  (33,31% / 33,44% / 33,25%); NMI cluster-regime pari a 0,822.
+- Soglie P99 per cluster calibrate soltanto sul train. Sul test vengono prodotti 486 alert su
+  68.702 righe (0,707%).
+- Contro i guasti sintetici noti: precision 0,8663, recall 0,1703 e F1 0,2847. Il risultato rende
+  esplicito il compromesso della soglia conservativa: pochi falsi allarmi, ma sensibilità limitata.
+- Le label sintetiche non entrano in preprocessing, PCA, clustering o soglie; sono usate soltanto
+  per la valutazione a posteriori.
+
+### Risultati dello studio storico (Fasi 1–6)
 
 - Split temporale: train (primi 7 giorni) 160.293 righe, test (ultimi 3 giorni) 68.716 righe, dopo
   l'esclusione di 1.391 righe con gap di missing troppo lunghi per l'interpolazione.
@@ -146,6 +171,8 @@ in una seconda forma equivalente.
 data/raw/          Dataset originale, immutabile (escluso da git)
 data/processed/    Feature engineered / split train-test (escluso da git)
 notebooks/         Notebook narrativo: spiegazione, ragionamento, grafici, risultati per fase
+kaggle/            Notebook Kaggle riproducibile e metadata per la pubblicazione
+scripts/           CLI per generare il nuovo dataset sintetico originale
 src/               Funzioni pure (preprocessing, feature engineering, clustering, soglia, validazione
                    e viste per il reporting) importate dal notebook
 tests/             Unit test pytest per src/ (esegui: pytest)
@@ -159,7 +186,7 @@ Ambiente: Python 3.13. Dalla radice del repository:
 `pip install -r requirements.txt -r requirements-dev.txt`.
 
 - Test: `pytest tests/ -v` (aggiungere `--cov=src --cov-report=term-missing` per la copertura)
-- Lint: `ruff check src tests`
+- Lint: `ruff check src tests scripts`
 - Controlli automatici prima di ogni commit: `pre-commit install` (una tantum), poi girano da soli
   a ogni `git commit`; per lanciarli manualmente su tutto il progetto: `pre-commit run --all-files`
 - Esecuzione end-to-end del notebook su una copia temporanea, senza toccare il file versionato
@@ -169,10 +196,9 @@ Ambiente: Python 3.13. Dalla radice del repository:
   jupyter nbconvert --to notebook --execute --output-dir <directory-temporanea> --ExecutePreprocessor.timeout=1200 --ExecutePreprocessor.kernel_name=python3 "notebooks/Rilevamento di anomalie in dati IoT con clustering-Sebastiano_Cugnata.ipynb"
   ```
 - Integrazione continua: test e lint girano automaticamente a ogni push tramite GitHub Actions
-  (`.github/workflows/tests.yml`). Lo stesso workflow esegue anche il
-  notebook end-to-end (su una copia temporanea, il file versionato non viene modificato) quando
-  trova il dataset in `data/raw/`; poiché il CSV non è incluso nel repository, questo step viene
-  saltato in CI e va verificato in locale con una copia reale dei dati
+  (`.github/workflows/tests.yml`). Lo stesso workflow esegue sempre il notebook Kaggle end-to-end,
+  perché i dati vengono generati in memoria. Il notebook storico viene eseguito solo quando il suo
+  CSV locale è disponibile; il file non è incluso nel repository pubblico.
 
 ## Licenza
 
