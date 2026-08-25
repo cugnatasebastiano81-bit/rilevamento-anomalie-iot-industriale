@@ -1,0 +1,21 @@
+# Controlli eseguiti automaticamente da git prima di ogni commit.
+# Attivazione (una tantum, dopo aver installato requirements-dev.txt):
+#   pre-commit install
+# Da quel momento "git commit" esegue questi controlli da solo; se uno fallisce
+# il commit viene bloccato e va corretto il problema segnalato prima di riprovare.
+# Per lanciarli a mano su tutto il progetto senza fare un commit:
+#   pre-commit run --all-files
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff (lint di src/ e tests/)
+        entry: ruff check src tests
+        language: system
+        pass_filenames: false
+
+      - id: pytest
+        name: pytest (suite di test)
+        entry: pytest tests/ -q
+        language: system
+        pass_filenames: false

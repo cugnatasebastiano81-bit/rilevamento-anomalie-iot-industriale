@@ -1,0 +1,43 @@
+name: Test suite
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.13"
+
+      - name: Installa dipendenze
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check src tests
+
+      - name: Test con copertura
+        run: pytest tests/ -v --cov=src --cov-report=term-missing
+
+      - name: Esecuzione end-to-end del notebook (copia temporanea, timeout 20 minuti)
+        run: |
+          if [ ! -f "data/raw/iot_synth_anomaly_clustering.csv" ]; then
+            echo "Dataset non presente (data/raw/*, escluso dal repository): step saltato." \
+                 "Il notebook richiede il CSV reale per essere eseguito, vedi README.md."
+            exit 0
+          fi
+          mkdir -p /tmp/notebook_ci_run
+          jupyter nbconvert --to notebook --execute \
+            --output-dir /tmp/notebook_ci_run \
+            --ExecutePreprocessor.timeout=1200 \
+            --ExecutePreprocessor.kernel_name=python3 \
+            "notebooks/Rilevamento di anomalie in dati IoT con clustering-Sebastiano_Cugnata.ipynb"
+        # esecuzione reale delle celle in ordine, fallisce se una cella solleva un errore o supera
+        # il timeout; l'output eseguito va in una directory temporanea, il notebook versionato nel
+        # repository non viene toccato da questo step. Salta (senza fallire la CI) quando il
+        # dataset non è disponibile nel runner, come nel repository pubblico: in quel caso il
+        # notebook va verificato eseguendolo in locale con una copia del CSV.

@@ -1,0 +1,8 @@
+# Strumenti di sviluppo: non necessari per eseguire la pipeline o il notebook,
+# solo per chi modifica il codice in src/ e tests/.
+# Installazione: pip install -r requirements.txt -r requirements-dev.txt
+# Versioni verificate con `pip freeze` nell'ambiente di sviluppo il 2026-08-17.
+
+ruff==0.16.3          # linting (controlli di stile e di codice sospetto)
+pytest-cov==7.1.0      # copertura dei test (pytest --cov=src)
+pre-commit==4.6.2      # esegue i controlli automatici prima di ogni commit

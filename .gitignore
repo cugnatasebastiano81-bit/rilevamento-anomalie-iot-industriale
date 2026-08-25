@@ -1,0 +1,31 @@
+# Dati (immutabili, non versionati)
+*.zip
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+/iot_synth_anomaly_clustering.csv
+
+# Ambiente Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Tooling di sviluppo
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Artefatti modello
+*.joblib
+*.pkl
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/

@@ -1,0 +1,12 @@
+target-version = "py313"
+line-length = 120
+
+include = ["src/**/*.py", "tests/**/*.py"]
+
+[lint]
+select = [
+    "E",   # errori di stile pycodestyle
+    "F",   # errori logici pyflakes (variabili non usate, import morti, ecc.)
+    "W",   # warning di stile
+    "I",   # import non ordinati
+]

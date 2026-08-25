@@ -1,0 +1,20 @@
+# Python 3.13: versioni verificate con `pip freeze` nell'ambiente di sviluppo il 2026-08-13.
+# Ricreare l'ambiente: python -m venv .venv && .venv\Scripts\activate && pip install -r requirements.txt
+
+# Librerie usate direttamente nel codice del notebook (Fase 1: pandas/numpy/matplotlib;
+# scikit-learn/scipy da Fase 2 in poi per StandardScaler/PCA/KMeans/metriche)
+pandas==3.0.2
+numpy==2.4.4
+matplotlib==3.11.1
+scikit-learn==1.9.0
+scipy==1.18.0
+
+# Per aprire ed eseguire il notebook (.ipynb) con un kernel reale
+jupyter==1.1.1
+notebook==7.6.2
+ipykernel==7.3.0
+nbconvert==7.17.1
+nbformat==5.11.0
+
+# Test della logica in src/
+pytest==9.1.1
