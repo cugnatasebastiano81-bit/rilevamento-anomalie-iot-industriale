@@ -59,6 +59,9 @@ Notebook narrativo (spiegazione, codice, grafici, risultati per fase):
 Notebook Kaggle riproducibile:
 `kaggle/rilevamento_anomalie_iot_kaggle.ipynb`.
 
+Versione pubblica eseguita su Kaggle:
+[Anomalie IoT industriali con clustering](https://www.kaggle.com/code/sebastianocugnata/anomalie-iot-industriali-con-clustering).
+
 ### Risultati chiave della dimostrazione Kaggle riproducibile
 
 - Split temporale: 160.678 righe di train e 68.702 righe di test dopo interpolazione separata e
