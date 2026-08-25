@@ -21,10 +21,11 @@ parametri predefiniti il CSV contiene 230.400 righe e il suo SHA-256 è
 ## Pubblicazione futura
 
 `kernel-metadata.json` mantiene il notebook privato e abilita Internet perché, su Kaggle, il codice
-viene caricato dal repository GitHub pubblico. Prima della pubblicazione occorre sostituire il
-riferimento `main` nel notebook con un tag Git immutabile, eseguire il notebook su Kaggle, controllare
-gli output e solo dopo impostare la visibilità pubblica. Non è necessario pubblicare un Kaggle Dataset:
-i dati vengono generati durante l'esecuzione.
+viene caricato dal repository GitHub pubblico. Il notebook usa il tag Git immutabile
+`kaggle-v1.0.0`: in questo modo codice e risultati non cambiano quando evolve `main`. Prima di una
+nuova release occorre creare e verificare un nuovo tag, aggiornare il riferimento ed eseguire di nuovo
+il notebook su Kaggle. Non è necessario pubblicare un Kaggle Dataset: i dati vengono generati durante
+l'esecuzione.
 
 Il codice è coperto dalla licenza MIT del repository. I dati sono interamente sintetici e non
 rappresentano misure reali, persone, aziende o impianti esistenti.
